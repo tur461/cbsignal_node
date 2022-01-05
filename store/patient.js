@@ -18,6 +18,12 @@ function add(det) {
     patient_list.push(patient);
 }
 
+function update_doctor_id_of_patient(patient_id, doctor_id) {
+    for(let i=0, l=patient_list.length; i<l; ++i)
+        if(patient_list[i].id === patient_id)
+            patient_list[i].doctor_id = doctor_id;
+}
+
 function _update_status(socket_id, prop, status) {
     console.log(`[patient] updating status:: sid: ${socket_id}, prop: ${prop}, status: ${status}`);
     for(let i=0, l=patient_list.length; i<l; ++i)
@@ -87,6 +93,18 @@ function get_socket_id(patient_id) {
     return '';
 }
 
+function get_socket_ids_with_patient_id(patient_id) {
+    return patient_list
+            .filter(pat => pat.id === patient_id)
+            .map(pat => pat.socket_id);
+}
+
+function update_doctor_id(patient_ids, doctor_id) {
+    for(let i=0, l=patient_list.length; i<l; ++i)
+        if(patient_ids.includes(patient_list[i].id))
+            patient_list[i].doctor_id = doctor_id;
+}
+
 function dbg_list() {
     return patient_list;
 }
@@ -95,8 +113,10 @@ const p_store = {
     add,
     util: new Util(),
     dbg_list,
-    get_patient_id,
     get_socket_id,
+    get_patient_id,
+    update_doctor_id,
+    get_socket_ids_with_patient_id,
 }
 
 module.exports = {

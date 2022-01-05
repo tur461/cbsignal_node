@@ -21,6 +21,8 @@ const {
 } = require('./utils');
 const {
     ns,
+    s_d_type,
+    s_p_type,
 } = require('./constants');
 
 
@@ -94,10 +96,15 @@ function handle_parsed(parsed) {
     if(parsed.data.from === 'doctor'){
         det.patient_id_list = parsed.data.pids;
         d_store.add({...det});
+        p_store.update_doctor_id(det.patient_id_list, det.id);
+        doctor_handler.notify_connected_patients_about_doctor(det.socket_id, s_p_type.DOCTOR_AVAILABLE, 'online');
     } else if(parsed.data.from === 'patient'){
         det.doctor_id = parsed.data.doctor_id
         det.slot = parsed.data.slot;
         p_store.add({...det});
+        let mp = d_store.get_pidi_map();
+        Object.keys(mp).forEach(did => p_store.update_doctor_id(mp[did], did));
+        doctor_handler.notify_doctor_about_patient(det.socket_id, s_d_type.PATIENT_AVAILABLE);
     }
 }
 

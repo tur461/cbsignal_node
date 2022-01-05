@@ -1,7 +1,7 @@
+const { idText } = require('typescript');
 const { d_store } = require('./doctor');   
 const { p_store } = require('./patient');   
 const { sock_store } = require('./sockets');
-
 
 function get_doctor_socket(doctor_id) {
     return sock_store.get_socket(d_store.get_socket_id(doctor_id));

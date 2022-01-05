@@ -116,8 +116,27 @@ function update_plpd_map(socket_id, patient_id_list) {
     patient_id_list_per_doctor_map[get_doctor_id(socket_id)] = patient_id_list;
 }
 
-function get_patient_list(socket_id) {
+function get_patient_ids(socket_id) {
     return patient_id_list_per_doctor_map[get_doctor_id(socket_id)];
+}
+
+function get_name(socket_id) {
+    let docs = doctor_list.filter(doc => doc.socket_id == socket_id);
+    return docs.length ? docs[0].name : 'NA';
+}
+
+function get_pidi_map() {
+    let mp = {};
+    doctor_list.forEach(doc => {
+        mp[doc.id] = doc.patient_id_list;
+    });
+    return mp;
+}
+
+function get_connected_doctor_socket_ids(patient_id) {
+    return doctor_list
+    .filter(doc => doc.patient_id_list.indexOf(patient_id) != -1)
+    .map(doc.socket_id);
 }
 
 function dbg_list() {
@@ -128,13 +147,16 @@ const d_store = {
     add,
     util: new Util,
     dbg_list,
-    add_to_cdp_map,
-    rem_from_cdp_map,
+    get_name,
+    get_pidi_map,
     get_doctor_id,
     get_socket_id,
-    get_connected_patient_id,
+    add_to_cdp_map,
     update_plpd_map,
-    get_patient_list,
+    rem_from_cdp_map,
+    get_patient_ids,
+    get_connected_patient_id,
+    get_connected_doctor_socket_ids,
 }
 
 module.exports = {

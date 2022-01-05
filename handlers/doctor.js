@@ -1,12 +1,15 @@
 const { util }      = require('../utils');
 const { 
     d_store, 
-    s_store 
+    s_store, 
+    p_store
 }                   = require('../store');
 const { 
     ns,
     d_act,
     d_type,
+    s_p_type,
+    s_d_type,
 }                   = require('../constants');
 
 
@@ -35,6 +38,7 @@ function listen(socket) {
             case d_type.PID_LIST_UPDATE :
                 let patient_id_list = dat.pids;
                 d_store.update_plpd_map(socket.id, patient_id_list);
+
                 notify_doctor_about_connected_patients(socket);
                 socket.emit(ns.MSG_FROM_SERVER, util.ser_en({
                     from: 'server',
@@ -61,7 +65,7 @@ function emit_to_connected_patient(socket, patient_id, dat) {
 }
 
 function notify_doctor_about_connected_patients(socket) {
-    let patient_ids = d_store.get_patient_list(socket.id),
+    let patient_ids = d_store.get_patient_ids(socket.id),
         connected_patient_ids = s_store.get_patient_ids();
     for (id of patient_ids) {
         if(connected_patient_ids.includes(id))
@@ -75,8 +79,36 @@ function notify_doctor_about_connected_patients(socket) {
 
 }
 
+function notify_connected_patients_about_doctor(socket_id, type, status) {
+    let patient_ids = d_store.get_patient_ids(socket_id),
+        con_patient_sids = s_store.get_patient_socket_ids();
+    con_patient_sids = con_patient_sids.map(pid => patient_ids.indexOf(pid));
+    s_store.send_to_many(ns.MSG_FROM_SERVER, con_patient_sids, util.ser_en({
+        from: 'server',
+        for: 'patient',
+        type: type,
+        msg: `${d_store.get_doctor_id(socket_id)}:${d_store.get_name(socket_id)}:${status}`
+    }));
+
+}
+
+function notify_doctor_about_patient(socket_id, type) {
+    let patient_id = p_store.get_patient_id(socket_id);
+    s_store.send_to_many(
+        ns.MSG_FROM_SERVER, 
+        d_store.get_connected_doctor_socket_ids(patient_id),
+        util.ser_en({
+        from: 'server', for: 'doctor', type, pid: patient_id
+        })
+    );
+}
+
+
+
 const doctor_handler = {
-    listen
+    listen,
+    notify_doctor_about_patient,
+    notify_connected_patients_about_doctor,
 }
 
 module.exports = {
