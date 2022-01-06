@@ -101,12 +101,12 @@ function get_socket_ids_with_patient_id(patient_id) {
 
 function update_doctor_id(patient_ids, doctor_id) {
     for(let i=0, l=patient_list.length; i<l; ++i)
-        if(patient_ids.includes(patient_list[i].id))
+        if(patient_ids.indexOf(patient_list[i].id) != -1)
             patient_list[i].doctor_id = doctor_id;
 }
 
 function dbg_list() {
-    return patient_list;
+    return [...patient_list];
 }
 
 const p_store = {
@@ -116,6 +116,7 @@ const p_store = {
     get_socket_id,
     get_patient_id,
     update_doctor_id,
+    // update_doctor_id_of_patient,
     get_socket_ids_with_patient_id,
 }
 

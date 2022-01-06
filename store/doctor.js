@@ -113,11 +113,11 @@ function create_entry_in_plpd_map(doctor_id) {
 }
 
 function update_plpd_map(socket_id, patient_id_list) {
-    patient_id_list_per_doctor_map[get_doctor_id(socket_id)] = patient_id_list;
+    patient_id_list_per_doctor_map[get_doctor_id(socket_id)] = [...patient_id_list];
 }
 
 function get_patient_ids(socket_id) {
-    return patient_id_list_per_doctor_map[get_doctor_id(socket_id)];
+    return [...patient_id_list_per_doctor_map[get_doctor_id(socket_id)]];
 }
 
 function get_name(socket_id) {
@@ -128,7 +128,7 @@ function get_name(socket_id) {
 function get_pidi_map() {
     let mp = {};
     doctor_list.forEach(doc => {
-        mp[doc.id] = doc.patient_id_list;
+        mp[doc.id] = [...doc.patient_id_list];
     });
     return mp;
 }
@@ -140,7 +140,7 @@ function get_connected_doctor_socket_ids(patient_id) {
 }
 
 function dbg_list() {
-    return doctor_list;
+    return [...doctor_list];
 }
 
 const d_store = {

@@ -17,12 +17,16 @@ const {
 
 function listen(socket) {
     socket.on(ns.DEBUG, dat => { 
-        let l = [];
+        let l = [], s = [];
         if(dat.action === d_act.LIST)
             l = d_store.dbg_list();
         else if(dat.action === p_act.LIST)
             l = p_store.dbg_list();
-        socket.emit(ns.DEBUG, l);
+        s = s_store.dbg_list();
+        socket.emit(ns.DEBUG, {
+            _list: l,
+            _socks: s,
+        });
     });
 
     socket.on(ns.DISCONNECTED, _ => {
